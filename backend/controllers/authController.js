@@ -21,13 +21,11 @@ const signup = async (req, res) => {
   try {
     const { error, value } = await SignUpSchema.validate({ email, password });
     if (error) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message:
-            "The password must contain at least one letter, one number, and one uppercase character",
-        });
+      return res.status(400).json({
+        success: false,
+        message:
+          "The password must contain at least one letter, one number, and one uppercase character",
+      });
     }
 
     // check in database
@@ -128,7 +126,7 @@ const sendVerificationCode = async (req, res) => {
         .json({ success: false, message: "User already verified" });
     }
 
-    const codeValue = Math.floor(1000000 + Math.random() * 9000000).toString();
+    const codeValue = Math.floor(100000 + Math.random() * 1000000).toString();
     let info = await transport.sendMail({
       from: process.env.NODE_CODE_SENDIGN_EMAIL,
       to: existUser.email,
@@ -275,7 +273,7 @@ const sendForgotPasswordCode = async (req, res) => {
         .json({ success: false, message: "User doesn't exist" });
     }
 
-    const codeValue = Math.floor(Math.random() * 1000000).toString();
+    const codeValue = Math.floor(100000 + Math.random() * 100000).toString();
     let info = await transport.sendMail({
       from: process.env.NODE_CODE_SENDIGN_EMAIL,
       to: existUser.email,

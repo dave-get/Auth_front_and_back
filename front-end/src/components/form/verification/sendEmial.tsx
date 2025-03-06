@@ -8,10 +8,6 @@ import { toastError, toastSuccess } from "@/components/toastify/toastify";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
 
-// interface ForgotPwEmailProps {
-//   setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-// }
-
 const ForgotPwSchema = z.object({
   email: z
     .string({
@@ -22,7 +18,7 @@ const ForgotPwSchema = z.object({
 });
 
 type formData = z.infer<typeof ForgotPwSchema>;
-const VerifyEmail = () => {
+const VerifyAccountEmail = ({ token }: { token: string }) => {
   const [isLoading, setLoading] = React.useState(false);
   const router = useRouter();
   const {
@@ -35,22 +31,26 @@ const VerifyEmail = () => {
 
   const uri = process.env.NEXT_PUBLIC_BASE_URL;
   const onSubmit = async (data: any) => {
+    localStorage.setItem("verifyAcountEmail", data.email);
     setLoading(true);
     const res = await fetch(`${uri}/send-verification-code`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        client: "not-browser",
+        authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
 
-    if (res.ok) {
-      toastSuccess("Verification Code Sent");
-      router.push("/api/VerifynewPassword");
+    const resdata = await res.json();
+    if (resdata.success) {
+      toastSuccess(resdata.message);
+      router.push("/api/verifyAccount/verifyWithCode");
       setLoading(false);
     }
-    if (!res.ok) {
-      toastError("Error in sending code");
+    if (!resdata.success) {
+      toastError(resdata.message);
       setLoading(false);
     }
   };
@@ -81,4 +81,4 @@ const VerifyEmail = () => {
   );
 };
 
-export default VerifyEmail;
+export default VerifyAccountEmail;
