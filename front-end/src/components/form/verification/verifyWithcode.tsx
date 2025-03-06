@@ -15,17 +15,11 @@ const ForgotPwSchema = z.object({
       message: "verificationCode is required",
     })
     .min(6, "verificationCode is too short"),
-  NewPassword: z
-    .string({
-      required_error: "NewPassword is required",
-      message: "NewPassword is required",
-    })
-    .min(8, "NewPassword is too short"),
 });
 
 type formData = z.infer<typeof ForgotPwSchema>;
 
-const VerifyAccount = () => {
+const VerifyAccount = ({ token }: { token: string }) => {
   const [isLoading, setLoading] = useState(false);
   const router = useRouter();
   const {
@@ -38,27 +32,29 @@ const VerifyAccount = () => {
 
   const uri = process.env.NEXT_PUBLIC_BASE_URL;
   const onSubmit = async (data: any) => {
+    const SentEmail = localStorage.getItem("verifyAcountEmail");
+    console.log("sent email*****",SentEmail)
     setLoading(true);
-    const res = await fetch(`${uri}/verify-forgot-password-code`, {
+    const res = await fetch(`${uri}/verify-code`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        client: "not-browser",
+        authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        email: "davewaanofii@gmail.com",
+        email: SentEmail,
         providedCode: data.verificationCode,
-        newPassword: data.NewPassword,
       }),
     });
     const resdata = await res.json();
-    console.log("*********", resdata);
-    if (res.ok) {
-      router.push("/api/auth/signin");
-      toastSuccess("Account Verified!");
+    if (resdata.success) {
+      toastSuccess(resdata.message);
+      router.push("/homePage");
       setLoading(false);
     }
-    if (!res.ok) {
-      toastError("Error with verification");
+    if (!resdata.success) {
+      toastError(resdata.message);
       setLoading(false);
     }
   };
@@ -66,7 +62,7 @@ const VerifyAccount = () => {
   return (
     <div className="flex flex-col space-y-4 w-[50%] h-[50%] items-center">
       <h1 className="text-center text-4xl font-bold font-serif">
-        Forgot Password
+        Verify Your Account
       </h1>
 
       <form
@@ -81,15 +77,6 @@ const VerifyAccount = () => {
           register={register}
           placeholder="Enter verificationCode"
           errorMessage={errors?.verificationCode?.message as string}
-        />
-        <InputGroup
-          id="NewPassword"
-          label="New Password"
-          inputType="password"
-          registerName="NewPassword"
-          register={register}
-          placeholder="Enter New Password"
-          errorMessage={errors?.NewPassword?.message as string}
         />
         <button
           type="submit"
