@@ -1,5 +1,5 @@
 import React from "react";
-import NavbarSession from "@/components/navbar/navbarSession";
+import NavbarSession from "@/components/sessions/navbarSession";
 
 const HomePage = async () => {
   return (

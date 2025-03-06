@@ -1,7 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import React from "react";
-import NavBar from "./navbar";
+import NavBar from "../navbar/navbar";
 import jwt from "jsonwebtoken";
 
 const NavbarSession = async () => {
