@@ -2,6 +2,7 @@
 import React from "react";
 import { BadgeAlert, BadgeCheck } from "lucide-react";
 import SignOut from "../form/authform/signout";
+import Link from "next/link";
 
 const NavBar = ({ session, token }: { session: any; token: string }) => {
   if (!session) {
@@ -23,8 +24,10 @@ const NavBar = ({ session, token }: { session: any; token: string }) => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <p className="w-full">You are not Verified:</p>
-                <BadgeAlert color="#fab700" />
+                <p className="w-full">Verify Your account:</p>
+                <Link href="/api/verifyAccount/verifyEmail">
+                  <BadgeAlert color="#fab700" />
+                </Link>
               </div>
             )}
           </div>
