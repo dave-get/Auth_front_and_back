@@ -23,7 +23,11 @@ const signup = async (req, res) => {
     if (error) {
       return res
         .status(400)
-        .json({ success: false, message: error.details[0].message });
+        .json({
+          success: false,
+          message:
+            "The password must contain at least one letter, one number, and one uppercase character",
+        });
     }
 
     // check in database
