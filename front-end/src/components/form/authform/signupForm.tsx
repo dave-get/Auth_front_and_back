@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import InputGroup from "../inputGroup";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { toastError, toastSuccess } from "@/components/toastify/toastify";
 import { useRouter } from "next/navigation";
 import { userType } from "@/type/userType";
+import { Loader } from "lucide-react";
 
 const signupSchema = z.object({
   email: z
@@ -26,6 +27,7 @@ const signupSchema = z.object({
 
 type formData = z.infer<typeof signupSchema>;
 const SignupForm = () => {
+  const [isLoading, setLoading] = useState(false);
   const router = useRouter();
   const {
     register,
@@ -38,6 +40,7 @@ const SignupForm = () => {
   const uri = process.env.NEXT_PUBLIC_BASE_URL;
 
   const onSubmit = async (data: userType) => {
+    setLoading(true);
     const res = await fetch(`${uri}/signup`, {
       method: "POST",
       headers: {
@@ -48,14 +51,16 @@ const SignupForm = () => {
         password: data?.password,
       }),
     });
-    console.log("res:****", res);
-    if (res.ok) {
+    // console.log("res:****", res);
+    const resdata = await res.json();
+    if (resdata.success) {
       router.push("/api/auth/signin");
       toastSuccess("account created successfuly");
     }
-    if (!res.ok) {
-      toastError("Faild to sign up");
+    if (!resdata.success) {
+      toastError(resdata.message);
     }
+    setLoading(false);
   };
   return (
     <div>
@@ -86,7 +91,7 @@ const SignupForm = () => {
           type="submit"
           className="w-full bg-slate-300 text-slate-400 font-bold p-3 rounded-xl mt-5 cursor-pointer"
         >
-          Sign Up
+          {isLoading ? <Loader className="animate-spin w-full" /> : "SignUp"}
         </button>
       </form>
     </div>
